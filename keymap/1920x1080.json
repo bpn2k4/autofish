@@ -1,0 +1,122 @@
+{
+  "bag_button": {
+    "x": 1830,
+    "y": 600
+  },
+  "phone_button": {
+    "x": 1830,
+    "y": 460
+  },
+  "bag_favorite_button": {
+    "x": 90,
+    "y": 75
+  },
+  "bag_all_button": {
+    "x": 230,
+    "y": 75
+  },
+  "bag_car_button": {
+    "x": 370,
+    "y": 75
+  },
+  "bag_tool_button": {
+    "x": 495,
+    "y": 75
+  },
+  "bag_toy_button": {
+    "x": 630,
+    "y": 75
+  },
+  "bag_pet_button": {
+    "x": 760,
+    "y": 75
+  },
+  "bag_food_button": {
+    "x": 900,
+    "y": 75
+  },
+  "bag_fish_button": {
+    "x": 1040,
+    "y": 75
+  },
+  "bag_insect_button": {
+    "x": 1175,
+    "y": 75
+  },
+  "bag_oil_button": {
+    "x": 1310,
+    "y": 75
+  },
+  "bag_material_button": {
+    "x": 1440,
+    "y": 75
+  },
+  "bag_close_button": {
+    "x": 1850,
+    "y": 75
+  },
+  "bag_grid_0_0_button": {
+    "x": 210,
+    "y": 380
+  },
+  "bag_grid_0_1_button": {
+    "x": 510,
+    "y": 380
+  },
+  "bag_grid_0_2_button": {
+    "x": 810,
+    "y": 380
+  },
+  "bag_grid_0_3_button": {
+    "x": 1110,
+    "y": 380
+  },
+  "bag_grid_0_4_button": {
+    "x": 1410,
+    "y": 380
+  },
+  "bag_grid_0_5_button": {
+    "x": 1710,
+    "y": 380
+  },
+  "bag_grid_1_0_button": {
+    "x": 210,
+    "y": 760
+  },
+  "bag_grid_1_1_button": {
+    "x": 510,
+    "y": 760
+  },
+  "bag_grid_1_2_button": {
+    "x": 810,
+    "y": 760
+  },
+  "bag_grid_1_3_button": {
+    "x": 1110,
+    "y": 760
+  },
+  "bag_grid_1_4_button": {
+    "x": 1410,
+    "y": 760
+  },
+  "bag_grid_1_5_button": {
+    "x": 1710,
+    "y": 760
+  },
+  "cancel_button": {
+    "x": 1460,
+    "y": 810
+  },
+  "preserve_button": {
+    "x": 1500,
+    "y": 850
+  },
+  "throw_rod_button": {
+    "x": 1520,
+    "y": 660
+  },
+  "jump_button": {
+    "x": 1700,
+    "y": 850
+  }
+}
