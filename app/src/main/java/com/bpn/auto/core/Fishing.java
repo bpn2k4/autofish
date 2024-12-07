@@ -126,7 +126,7 @@ public class Fishing {
       if (!isJerk) {
         Logger.i("Dental mark = " + dental);
       }
-      if (dental > 5000000 && !isJerk) {
+      if (mark != -1 && dental > 5000000 && !isJerk) {
         Logger.i("Jerk rod");
         Control.touch(btnJerk);
         isJerk = true;
