@@ -108,8 +108,8 @@ public class Fishing {
         if (!isMatchBag) {
           Logger.i("Throw rod successfully");
           isJerk = false;
-          Logger.i("Sleep 15000ms");
-          Thread.sleep(15000);
+          Logger.i("Sleep 13000ms");
+          Thread.sleep(13000);
           MarkValue markValue = getCurrentMarkValue(screenshot);
           while (markValue.std > 1000) {
             screenshot = Capture.takeScreenshot();
