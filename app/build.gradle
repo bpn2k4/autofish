@@ -1,0 +1,21 @@
+apply plugin: 'com.android.application'
+
+repositories {
+  mavenCentral()
+  google()
+}
+
+android {
+  namespace 'com.bpn.auto'
+  compileSdk 34
+  defaultConfig {
+  applicationId "com.bpn.auto"
+    minSdkVersion 21
+    targetSdkVersion 34
+    versionCode 20700
+    versionName "2.7"
+  }
+  buildTypes {
+    release {}
+  }
+}

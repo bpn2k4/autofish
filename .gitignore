@@ -1,6 +1,7 @@
-temp/
-__pycache__
-*.pyc
+# Ignore Gradle project-specific cache directory
+.gradle
+.idea
 
-test.ipynb
-.vscode/
+# Ignore Gradle build output directory
+build
+local.properties
