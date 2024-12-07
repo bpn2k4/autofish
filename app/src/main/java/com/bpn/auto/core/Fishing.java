@@ -126,8 +126,16 @@ public class Fishing {
       if (!isJerk) {
         Logger.i("Dental mark = " + dental);
       }
+      if (dental > 5000000 && !isJerk) {
+        Logger.i("Jerk rod");
+        Control.touch(btnJerk);
+        isJerk = true;
+        Logger.i("Sleep 2000ms");
+        Thread.sleep(2000);
+        continue;
+      }
       if (markValue.std < 1000) {
-        if (mark != -1 && dental > 3000000 && !isJerk) {
+        if (mark != -1 && dental > 2500000 && !isJerk) {
           Logger.i("Jerk rod");
           Control.touch(btnJerk);
           isJerk = true;
