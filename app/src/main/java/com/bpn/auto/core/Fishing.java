@@ -26,9 +26,9 @@ public class Fishing {
 
   private final Mark mark = new Mark(100, 505, 20);
   private MarkValue markValue = new MarkValue(-1, -1);
-  private static final int MARK_CHANGE_THRESHOLD_DIRECTLY = 5000000;
-  private static final int MARK_CHANGE_THRESHOLD = 2000000;
-  private static final int MARK_STD_THRESHOLD = 1000;
+  private static final int MARK_CHANGE_THRESHOLD_DIRECTLY = 6000000;
+  private static final int MARK_CHANGE_THRESHOLD = 4000000;
+  private static final int MARK_STD_THRESHOLD = 5000;
   private boolean isJerk = false;
   private static final boolean isPreserveNewFish = false;
 
