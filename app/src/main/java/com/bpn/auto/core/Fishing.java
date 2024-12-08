@@ -153,7 +153,7 @@ public class Fishing {
       }
 
       // Improve change mark with weather condition like snow, rain
-      if (markValue.std < MARK_STD_THRESHOLD) {
+      if (currentMarkValue.std < MARK_STD_THRESHOLD) {
         if (markValue.mean != -1 && dental > MARK_CHANGE_THRESHOLD && !isJerk) {
           Logger.i("Dental mark=" + dental + " std=" + currentMarkValue.std);
           Logger.i("Jerk rod");
