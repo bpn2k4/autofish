@@ -1,9 +1,10 @@
 package com.bpn.auto.core;
 
+
 import android.graphics.Bitmap;
 import android.graphics.Rect;
-
 import java.lang.reflect.Method;
+
 
 public class Capture {
 

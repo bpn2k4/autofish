@@ -1,7 +1,6 @@
 package com.bpn.auto.core;
 
 import android.annotation.SuppressLint;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
