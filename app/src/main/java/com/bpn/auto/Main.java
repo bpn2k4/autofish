@@ -7,10 +7,9 @@ public class Main {
 
     try {
       Fishing fishing = new Fishing();
-      fishing.start();
+      fishing.start(Fishing.FISH_AND_PRESERVE_MODE);
     } catch (Exception e) {
       e.printStackTrace(System.out);
     }
   }
-
 }

@@ -7,10 +7,9 @@ public class Match {
     int offsetY = template.getY();
     int width = template.getWidth();
     int height = template.getHeight();
-    int[] pixels = region.getPixels(offsetX, offsetY, width, height);
-    for (int x = 0; x < template.getWidth(); x = x + 2) {
-      for (int y = 0; y < template.getHeight(); y = y + 2) {
-        if (template.getPixel(x, y) != pixels[x + y * width]) {
+    for (int x = 0; x < width; x = x + 2) {
+      for (int y = 0; y < height; y = y + 2) {
+        if (template.getPixel(x, y) != region.getPixel(offsetX + x, offsetY + y)) {
           return false;
         }
       }

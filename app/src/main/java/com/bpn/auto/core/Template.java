@@ -54,4 +54,10 @@ public class Template {
   public int getPixel(int x, int y) {
     return this.bitmap.getPixel(x, y);
   }
+
+  @Override
+  protected void finalize() throws Throwable {
+    this.bitmap.recycle();
+    super.finalize();
+  }
 }
