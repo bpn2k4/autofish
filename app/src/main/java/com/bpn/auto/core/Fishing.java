@@ -24,7 +24,7 @@ public class Fishing {
   private Template templateOpenCard;
   private Template templateConfirmCard;
 
-  private final Mark mark = new Mark(110, 505, 10);
+  private final Mark mark = new Mark(110, 505, 2);
   private MarkValue markValue = new MarkValue(-1, -1);
   private static final int MARK_CHANGE_THRESHOLD_DIRECTLY = 6000000;
   private static final int MARK_CHANGE_THRESHOLD = 4000000;
