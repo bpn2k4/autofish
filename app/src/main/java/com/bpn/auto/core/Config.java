@@ -8,6 +8,6 @@ public class Config {
   public static int MARK_WIDTH = 44;
   public static int MARK_HEIGHT = 44;
   public static int MARK_SQUARE = MARK_WIDTH * MARK_HEIGHT;
-  public static double MARK_CHANGE_THRESHOLD = 0.25;
-  
+  public static double MARK_CHANGE_THRESHOLD = 0.2;
+
 }

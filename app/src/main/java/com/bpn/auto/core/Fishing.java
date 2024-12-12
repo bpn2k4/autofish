@@ -119,12 +119,18 @@ public class Fishing {
           isJerk = false;
           Logger.i("Sleep 13000ms");
           Thread.sleep(13000);
+          Logger.i("Wait for fish eat bait");
           mark = computeCurrentMarkValue(screenshot);
           continue;
         }
       }
 
       Mark currentMark = computeCurrentMarkValue(screenshot);
+      if (mark.getMean() == -1) {
+        mark = currentMark;
+        continue;
+      }
+
       double dental = Math.abs((mark.getMean() - currentMark.getMean()) * 1.0 / mark.getMean());
 //      if (!isJerk) {
 //        Logger.i("Old mean=" + mark.getMean() + " ,std=" + mark.getStd() + " Current mean=" + currentMark.getMean() + " ,std=" + currentMark.getStd() + " Dental=" + dental);
