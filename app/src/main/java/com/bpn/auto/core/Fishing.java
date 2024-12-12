@@ -24,11 +24,7 @@ public class Fishing {
   private Template templateOpenCard;
   private Template templateConfirmCard;
 
-  private final Mark mark = new Mark(110, 505, 2);
-  private MarkValue markValue = new MarkValue(-1, -1);
-  private static final int MARK_CHANGE_THRESHOLD_DIRECTLY = 6000000;
-  private static final int MARK_CHANGE_THRESHOLD = 4000000;
-  private static final int MARK_STD_THRESHOLD = 1000;
+  private Mark mark = new Mark(-1, -1);
   private boolean isJerk = false;
   private static final boolean isPreserveNewFish = false;
 
@@ -57,7 +53,6 @@ public class Fishing {
 
   private void startFishAndPreserve() throws InterruptedException {
     Logger.i("Start fish and preserve mode!");
-    Logger.i("Using mark position x=" + mark.x + ", y=" + mark.y + ", size=" + mark.size);
 
     while (true) {
       Image screenshot = Capture.takeScreenshot();
@@ -124,47 +119,25 @@ public class Fishing {
           isJerk = false;
           Logger.i("Sleep 13000ms");
           Thread.sleep(13000);
-          MarkValue currentMarkValue = getCurrentMarkValue(screenshot);
-          while (currentMarkValue.std > MARK_STD_THRESHOLD) {
-            screenshot = Capture.takeScreenshot();
-            currentMarkValue = getCurrentMarkValue(screenshot);
-          }
-          markValue = currentMarkValue;
-          Logger.i(markValue.toLogString());
+          mark = computeCurrentMarkValue(screenshot);
           continue;
         }
       }
 
-      MarkValue currentMarkValue = getCurrentMarkValue(screenshot);
-      int dental = Math.abs(currentMarkValue.mean - markValue.mean);
+      Mark currentMark = computeCurrentMarkValue(screenshot);
+      double dental = Math.abs((mark.getMean() - currentMark.getMean()) * 1.0 / mark.getMean());
 //      if (!isJerk) {
-//        Logger.i("Old" + markValue.toLogString() + "new: " + currentMarkValue.toLogString() + "Dental mark=" + dental + " std=" + currentMarkValue.std);
+//        Logger.i("Old mean=" + mark.getMean() + " ,std=" + mark.getStd() + " Current mean=" + currentMark.getMean() + " ,std=" + currentMark.getStd() + " Dental=" + dental);
 //      }
-
-      // Directly jerk rod
-      if (markValue.mean != -1 && dental > MARK_CHANGE_THRESHOLD_DIRECTLY && !isJerk) {
-        Logger.i("Dental mark=" + dental + " std=" + currentMarkValue.std);
+      if (!isJerk && dental >= Config.MARK_CHANGE_THRESHOLD) {
+        Logger.i("Dental=" + dental);
         Logger.i("Jerk rod");
         Control.touch(btnJerk);
         isJerk = true;
         Logger.i("Sleep 2000ms");
         Thread.sleep(2000);
-        continue;
       }
-
-      // Improve change mark with weather condition like snow, rain
-      if (currentMarkValue.std < MARK_STD_THRESHOLD) {
-        if (markValue.mean != -1 && dental > MARK_CHANGE_THRESHOLD && !isJerk) {
-          Logger.i("Dental mark=" + dental + " std=" + currentMarkValue.std);
-          Logger.i("Jerk rod");
-          Control.touch(btnJerk);
-          isJerk = true;
-          Logger.i("Sleep 2000ms");
-          Thread.sleep(2000);
-          continue;
-        }
-        markValue = currentMarkValue;
-      }
+      mark = currentMark;
     }
   }
 
@@ -218,27 +191,26 @@ public class Fishing {
   * Get current mark value
   * Return mean and std of mark value in square
   * */
-  private MarkValue getCurrentMarkValue(Image screenshot) {
+  private Mark computeCurrentMarkValue(Image screenshot) {
     long total_pixels_value = 0;
-    int offsetX = mark.x - mark.size / 2;
-    int offsetY = mark.y - mark.size / 2;
-    int markSize = mark.size;
-    for (int x = 0; x < markSize; x++) {
-      for (int y = 0; y < markSize; y++) {
+    int offsetX = Config.MARK_POSITION_X - Config.MARK_WIDTH / 2;
+    int offsetY = Config.MARK_POSITION_Y - Config.MARK_HEIGHT / 2;
+    for (int x = 0; x < Config.MARK_WIDTH; x++) {
+      for (int y = 0; y < Config.MARK_HEIGHT; y++) {
         int pixel = screenshot.getPixel(offsetX + x, offsetY + y);
         total_pixels_value += pixel;
       }
     }
-    int mean = (int) (total_pixels_value * 1.0 / (markSize * markSize));
-    int dental = 0;
-    for (int x = 0; x < markSize; x++) {
-      for (int y = 0; y < markSize; y++) {
+    int mean = (int) (total_pixels_value / Config.MARK_SQUARE);
+    long dental = 0;
+    for (int x = 0; x < Config.MARK_WIDTH; x++) {
+      for (int y = 0; y < Config.MARK_HEIGHT; y++) {
         int pixel = screenshot.getPixel(offsetX + x, offsetY + y);
-        dental += (pixel - mean) * (pixel - mean);
+        dental += (long) (pixel - mean) * (pixel - mean);
       }
     }
-    int std = (int) Math.sqrt(dental * 1.0 / markSize);
-    return new MarkValue(mean, std);
+    int std = (int) Math.sqrt(dental) / Config.MARK_SQUARE;
+    return new Mark(mean, std);
   }
 
   private void init() {
@@ -259,34 +231,5 @@ public class Fishing {
     templateOpenCard = new Template("open_card", 1055, 600, "/data/local/tmp/assets/template_open_card.png");
     templateConfirmCard = new Template("confirm_card", 690, 600, "/data/local/tmp/assets/template_confirm_card.png");
 
-  }
-
-  private static class MarkValue {
-    private final int mean;
-    private final int std;
-
-    public MarkValue(int mean, int std) {
-      this.mean = mean;
-      this.std = std;
-    }
-
-    public String toLogString() {
-      return "MarkValue{" +
-          "mean=" + mean +
-          ", std=" + std +
-          '}';
-    }
-  }
-
-  private static class Mark {
-    private final int x;
-    private final int y;
-    private final int size;
-
-    public Mark(int x, int y, int size) {
-      this.x = x;
-      this.y = y;
-      this.size = size;
-    }
   }
 }
