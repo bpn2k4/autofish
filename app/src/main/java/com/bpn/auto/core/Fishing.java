@@ -131,21 +131,14 @@ public class Fishing {
         continue;
       }
 
-      double dentalMean = Math.abs((mark.getMean() - currentMark.getMean()) * 1.0 / mark.getMean());
-      double dentalStd = Math.abs(mark.getStd() - currentMark.getStd());
-      // if (!isJerk) {
-      //   Logger.i("Old mean=" + mark.getMean() + " ,std=" + mark.getStd() + " Current mean=" + currentMark.getMean() + " ,std=" + currentMark.getStd() + " dentalMean=" + dentalMean + ", dentalStd=" + dentalStd);
-      // }
-      if (!isJerk && dentalStd >= Config.MARK_CHANGE_STD_THRESHOLD) {
-        Logger.i("Dental=" + dentalMean + " ,std=" + dentalStd);
-        Logger.i("Jerk rod");
-        Control.touch(btnJerk);
-        isJerk = true;
-        Logger.i("Sleep 2000ms");
-        Thread.sleep(2000);
+      double cohenD = (mark.getMean() - currentMark.getMean()) * 1.0 / Math.sqrt((Math.pow(mark.getStd(), 2) + Math.pow(currentMark.getStd(), 2)) / 2);
+      double cohenDNormalized =  1 / (1 + Math.exp(-cohenD));
+
+      if (!isJerk) {
+        // Logger.i("Old mean=" + mark.getMean() + " ,std=" + mark.getStd() + " Current mean=" + currentMark.getMean() + " ,std=" + currentMark.getStd() + " dental=" + cohenDNormalized);
       }
-      if (!isJerk && dentalMean >= Config.MARK_CHANGE_MEAN_THRESHOLD) {
-        Logger.i("Dental=" + dentalMean + " ,std=" + dentalStd);
+      if (!isJerk && (cohenDNormalized <= Config.MARK_LOWER_THRESHOLD || cohenDNormalized >= Config.MARK_UPPER_THRESHOLD) ) {
+        Logger.i("Dental=" + cohenDNormalized);
         Logger.i("Jerk rod");
         Control.touch(btnJerk);
         isJerk = true;
@@ -221,10 +214,11 @@ public class Fishing {
     for (int x = 0; x < Config.MARK_WIDTH; x++) {
       for (int y = 0; y < Config.MARK_HEIGHT; y++) {
         int pixel = screenshot.getPixel(offsetX + x, offsetY + y);
-        dental += (long) (pixel - mean) * (pixel - mean);
+        long difference = (long) (pixel - mean);
+        dental += difference * difference;
       }
     }
-    int std = (int) Math.sqrt(dental) / Config.MARK_SQUARE;
+    int std = (int) Math.sqrt(dental * 1.0 / Config.MARK_SQUARE);
     return new Mark(mean, std);
   }
 
