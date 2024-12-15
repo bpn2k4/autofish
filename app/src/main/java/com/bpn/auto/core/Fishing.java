@@ -131,12 +131,21 @@ public class Fishing {
         continue;
       }
 
-      double dental = Math.abs((mark.getMean() - currentMark.getMean()) * 1.0 / mark.getMean());
-//      if (!isJerk) {
-//        Logger.i("Old mean=" + mark.getMean() + " ,std=" + mark.getStd() + " Current mean=" + currentMark.getMean() + " ,std=" + currentMark.getStd() + " Dental=" + dental);
-//      }
-      if (!isJerk && dental >= Config.MARK_CHANGE_THRESHOLD) {
-        Logger.i("Dental=" + dental);
+      double dentalMean = Math.abs((mark.getMean() - currentMark.getMean()) * 1.0 / mark.getMean());
+      double dentalStd = Math.abs(mark.getStd() - currentMark.getStd());
+      // if (!isJerk) {
+      //   Logger.i("Old mean=" + mark.getMean() + " ,std=" + mark.getStd() + " Current mean=" + currentMark.getMean() + " ,std=" + currentMark.getStd() + " dentalMean=" + dentalMean + ", dentalStd=" + dentalStd);
+      // }
+      if (!isJerk && dentalStd >= Config.MARK_CHANGE_STD_THRESHOLD) {
+        Logger.i("Dental=" + dentalMean + " ,std=" + dentalStd);
+        Logger.i("Jerk rod");
+        Control.touch(btnJerk);
+        isJerk = true;
+        Logger.i("Sleep 2000ms");
+        Thread.sleep(2000);
+      }
+      if (!isJerk && dentalMean >= Config.MARK_CHANGE_MEAN_THRESHOLD) {
+        Logger.i("Dental=" + dentalMean + " ,std=" + dentalStd);
         Logger.i("Jerk rod");
         Control.touch(btnJerk);
         isJerk = true;
