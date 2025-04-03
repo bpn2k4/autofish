@@ -8,7 +8,6 @@ public class Fishing {
   public static final int FISH_AND_SELL_MODE = 1;
   public static final int THROW_ROD_ONLY_MODE = 2;
 
-
   private Button btnThrow;
   private Button btnPreserve;
   private Button btnJerk;
@@ -56,6 +55,11 @@ public class Fishing {
 
     while (true) {
       Image screenshot = Capture.takeScreenshot();
+
+      if (screenshot.getWidth() == 0) {
+        break;
+      }
+
       boolean isMatchConfirmDialog = Match.matchTemplate(screenshot, templateConfirmDialog);
       if (isMatchConfirmDialog) {
         Logger.i("Match confirm dialog");
@@ -83,12 +87,23 @@ public class Fishing {
         Thread.sleep(1000);
         screenshot = Capture.takeScreenshot();
         boolean isMatchConfirmCard = Match.matchTemplate(screenshot, templateConfirmCard);
+        int retry = 0;
         while (!isMatchConfirmCard) {
+          retry += 1;
+          if (retry > Config.MAX_RETRY_OPEN_CARD) {
+            break;
+          }
           Control.touch(btnConfirmOpenCard);
           Thread.sleep(1000);
           screenshot = Capture.takeScreenshot();
           isMatchConfirmCard = Match.matchTemplate(screenshot, templateConfirmCard);
         }
+        Control.touch(btnConfirmCard);
+        continue;
+      }
+
+      boolean isMatchConfirmCard = Match.matchTemplate(screenshot, templateConfirmCard);
+      if (isMatchConfirmCard) {
         Control.touch(btnConfirmCard);
         continue;
       }
@@ -131,14 +146,13 @@ public class Fishing {
         continue;
       }
 
-      double cohenD = (mark.getMean() - currentMark.getMean()) * 1.0 / Math.sqrt((Math.pow(mark.getStd(), 2) + Math.pow(currentMark.getStd(), 2)) / 2);
-      double cohenDNormalized =  1 / (1 + Math.exp(-cohenD));
+      double dental = Math.abs(mark.getStd() - currentMark.getStd()) * 1.0 / (mark.getStd() + Config.STD_EPSILON);
 
-      if (!isJerk) {
-        // Logger.i("Old mean=" + mark.getMean() + " ,std=" + mark.getStd() + " Current mean=" + currentMark.getMean() + " ,std=" + currentMark.getStd() + " dental=" + cohenDNormalized);
-      }
-      if (!isJerk && (cohenDNormalized <= Config.MARK_LOWER_THRESHOLD || cohenDNormalized >= Config.MARK_UPPER_THRESHOLD) ) {
-        Logger.i("Dental=" + cohenDNormalized);
+//      if (!isJerk) {
+//        Logger.i("Old std=" + mark.getStd() + " Current std=" + currentMark.getStd() + " Dental=" + dental);
+//      }
+      if (!isJerk && (dental > Config.STD_CHANGE_THRESHOLD) ) {
+        Logger.i("Dental=" + dental);
         Logger.i("Jerk rod");
         Control.touch(btnJerk);
         isJerk = true;
@@ -159,6 +173,11 @@ public class Fishing {
 
     while (true) {
       Image screenshot = Capture.takeScreenshot();
+
+      if (screenshot.getWidth() == 0) {
+        break;
+      }
+
       boolean isMatchConfirmDialog = Match.matchTemplate(screenshot, templateConfirmDialog);
       if (isMatchConfirmDialog) {
         Logger.i("Match confirm dialog");
@@ -209,16 +228,16 @@ public class Fishing {
         total_pixels_value += pixel;
       }
     }
-    int mean = (int) (total_pixels_value / Config.MARK_SQUARE);
+    long mean = total_pixels_value / Config.MARK_SQUARE;
     long dental = 0;
     for (int x = 0; x < Config.MARK_WIDTH; x++) {
       for (int y = 0; y < Config.MARK_HEIGHT; y++) {
         int pixel = screenshot.getPixel(offsetX + x, offsetY + y);
-        long difference = (long) (pixel - mean);
+        long difference = pixel - mean;
         dental += difference * difference;
       }
     }
-    int std = (int) Math.sqrt(dental * 1.0 / Config.MARK_SQUARE);
+    long std = (long) Math.sqrt(dental * 1.0 / Config.MARK_SQUARE);
     return new Mark(mean, std);
   }
 

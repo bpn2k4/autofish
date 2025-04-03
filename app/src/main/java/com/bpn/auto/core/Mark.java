@@ -2,19 +2,19 @@ package com.bpn.auto.core;
 
 
 public class Mark {
-  private final int mean;
-  private final int std;
+  private final long mean;
+  private final long std;
 
-  public Mark(int mean, int std) {
+  public Mark(long mean, long std) {
     this.mean = mean;
     this.std = std;
   }
 
-  public int getMean() {
+  public long getMean() {
     return mean;
   }
 
-  public int getStd() {
+  public long getStd() {
     return std;
   }
 }
