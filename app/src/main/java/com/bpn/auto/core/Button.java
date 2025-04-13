@@ -23,4 +23,3 @@ public class Button {
     return this.y;
   }
 }
-

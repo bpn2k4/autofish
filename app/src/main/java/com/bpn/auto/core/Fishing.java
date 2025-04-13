@@ -26,6 +26,7 @@ public class Fishing {
   private Mark mark = new Mark(-1, -1);
   private boolean isJerk = false;
   private static final boolean isPreserveNewFish = false;
+  private int numberFailThrowRod = 0;
 
   public Fishing() {
     init();
@@ -57,6 +58,11 @@ public class Fishing {
       Image screenshot = Capture.takeScreenshot();
 
       if (screenshot.getWidth() == 0) {
+        break;
+      }
+
+      if (numberFailThrowRod > 10) {
+        Logger.e("Something went wrong. Exit!");
         break;
       }
 
@@ -104,7 +110,11 @@ public class Fishing {
 
       boolean isMatchConfirmCard = Match.matchTemplate(screenshot, templateConfirmCard);
       if (isMatchConfirmCard) {
+        Logger.i("Match confirm card");
         Control.touch(btnConfirmCard);
+        Logger.i("Touch confirm card button");
+        Logger.i("Sleep 1000ms");
+        Thread.sleep(1000);
         continue;
       }
 
@@ -132,11 +142,15 @@ public class Fishing {
         if (!isMatchBag) {
           Logger.i("Throw rod successfully");
           isJerk = false;
+          numberFailThrowRod = 0;
           Logger.i("Sleep 13000ms");
           Thread.sleep(13000);
           Logger.i("Wait for fish eat bait");
           mark = computeCurrentMarkValue(screenshot);
           continue;
+        }
+        else {
+          numberFailThrowRod += 1;
         }
       }
 
@@ -146,7 +160,7 @@ public class Fishing {
         continue;
       }
 
-      double dental = Math.abs(mark.getStd() - currentMark.getStd()) * 1.0 / (mark.getStd() + Config.STD_EPSILON);
+      double dental = Math.abs(mark.getStd() - currentMark.getStd()) * 1.0 / (mark.getStd() + (Config.STD_EPSILON + mark.getStd()));
 
 //      if (!isJerk) {
 //        Logger.i("Old std=" + mark.getStd() + " Current std=" + currentMark.getStd() + " Dental=" + dental);
