@@ -1,6 +1,5 @@
 package com.bpn.auto.core;
 
-
 public class Config {
 
   public static int MARK_POSITION_X = 100;
@@ -10,6 +9,8 @@ public class Config {
   public static int MARK_SQUARE = MARK_WIDTH * MARK_HEIGHT;
   public static long STD_EPSILON = 1000000;
   public static double STD_CHANGE_THRESHOLD = 1.0;
-  public static int MAX_RETRY_OPEN_CARD = 5;
+  public static boolean DEBUG = false;
+  public static boolean HAS_MEMBERSHIP = true;
+  public static boolean SELL_ALL_FISH = false;
   
 }

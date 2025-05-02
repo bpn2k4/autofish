@@ -1,151 +1,154 @@
 package com.bpn.auto.core;
 
-
 @SuppressWarnings("BusyWait")
 public class Fishing {
-
-  public static final int FISH_AND_PRESERVE_MODE = 0;
-  public static final int FISH_AND_SELL_MODE = 1;
-  public static final int THROW_ROD_ONLY_MODE = 2;
-
-  private Button btnThrow;
-  private Button btnPreserve;
-  private Button btnJerk;
-  private Button btnConfirm;
-  private Button btnOpenCard;
-  private Button btnConfirmOpenCard;
-  private Button btnConfirmCard;
-
-  private Template bagTemplate;
-  private Template preserveTemplate;
-  private Template newFishTemplate;
-  private Template templateConfirmDialog;
-  private Template templateOpenCard;
-  private Template templateConfirmCard;
-
-  private Mark mark = new Mark(-1, -1);
-  private boolean isJerk = false;
-  private static final boolean isPreserveNewFish = false;
   private int numberFailThrowRod = 0;
+  private MeanStd mark = new MeanStd(-1, -1);
+  private boolean isJerk = false;
+  private boolean isOpenCard = false;
+  private final Logger logger;
 
   public Fishing() {
-    init();
+    if (Config.DEBUG) {
+      this.logger = new Logger(Logger.LogLevel.DEBUG);
+    }
+    else {
+      this.logger = new Logger();
+    }
   }
 
-  public void start(int mode) throws Exception {
-    if (mode == FISH_AND_PRESERVE_MODE) {
-      startFishAndPreserve();
-      return;
-    }
-
-    if (mode == FISH_AND_SELL_MODE) {
-      startFishAndSell();
-      return;
-    }
-
-    if (mode == THROW_ROD_ONLY_MODE) {
-      startThrowRodOnly();
-      return;
-    }
-
-    throw new Exception("Unknown mode");
-  }
-
-  private void startFishAndPreserve() throws InterruptedException {
-    Logger.i("Start fish and preserve mode!");
+  public void start() throws InterruptedException {
 
     while (true) {
+      if (this.numberFailThrowRod > 10) {
+        logger.e("Something went wrong. Exit!");
+        break;
+      }
+
       Image screenshot = Capture.takeScreenshot();
-
       if (screenshot.getWidth() == 0) {
+        logger.e("Something went wrong. Exit!");
         break;
       }
 
-      if (numberFailThrowRod > 10) {
-        Logger.e("Something went wrong. Exit!");
-        break;
-      }
-
-      boolean isMatchConfirmDialog = Match.matchTemplate(screenshot, templateConfirmDialog);
-      if (isMatchConfirmDialog) {
-        Logger.i("Match confirm dialog");
-        Control.touch(btnConfirm);
-        Logger.i("Touch confirm button");
-        continue;
-      }
-
-      boolean isMatchPreserve = Match.matchTemplate(screenshot, preserveTemplate);
-      if (isMatchPreserve) {
-        Logger.i("Match preserve");
-        Control.touch(btnPreserve);
-        Logger.i("Touch preserve button");
-        Logger.i("Sleep 1000ms");
+      if (Matcher.isMatchConfirmDialog(screenshot)) {
+        logger.d("Match confirm dialog");
+        logger.i("Touch confirm dialog button");
+        Control.touch(Const.buttonConfirmDialog);
+        logger.i("Sleep 1000ms");
         Thread.sleep(1000);
         continue;
       }
 
-      boolean isMatchOpenCard = Match.matchTemplate(screenshot, templateOpenCard);
-      if (isMatchOpenCard) {
-        Logger.i("Match open card");
-        Control.touch(btnOpenCard);
-        Logger.i("Touch open card button");
-        Logger.i("Sleep 1000ms");
+      if (Matcher.isMatchConfirmSell(screenshot)) {
+        logger.d("Match confirm sell");
+        logger.i("Touch confirm sell button");
+        Control.touch(Const.buttonConfirmSell);
+        logger.i("Sleep 1000ms");
         Thread.sleep(1000);
+        continue;
+      }
+
+      if (Matcher.isMatchCard(screenshot)) {
+        isOpenCard = true;
+        logger.d("Match open card");
+        logger.i("Touch open card button");
+        Control.touch(Const.buttonOpenCard);
+        logger.i("Sleep 1000ms");
+        Thread.sleep(1000);
+        continue;
+      }
+
+      if (Matcher.isMatchOpenAllCard(screenshot)) {
+        logger.d("Match open all card");
+        logger.i("Touch open all card button");
+        Control.touch(Const.buttonOpenAllCard);
+        logger.i("Sleep 1000ms");
+        Thread.sleep(1000);
+        continue;
+      }
+
+      if (Matcher.isMatchConfirmCard(screenshot)) {
+        logger.d("Match confirm card");
+        logger.i("Touch confirm card button");
+        Control.touch(Const.buttonConfirmCard);
+        logger.i("Sleep 1000ms");
+        Thread.sleep(1000);
+        continue;
+      }
+
+      if (Matcher.isMatchFish(screenshot)) {
+        Thread.sleep(200);
         screenshot = Capture.takeScreenshot();
-        boolean isMatchConfirmCard = Match.matchTemplate(screenshot, templateConfirmCard);
-        int retry = 0;
-        while (!isMatchConfirmCard) {
-          retry += 1;
-          if (retry > Config.MAX_RETRY_OPEN_CARD) {
-            break;
+        int level = this.getFishLevel(screenshot);
+        boolean isNewFish = this.isNewFish(screenshot);
+        boolean isCrownFish = this.isCrownFish(screenshot);
+        logger.i("Type=Fish Level=" + level + " New=" + isNewFish + " Crown=" + isCrownFish);
+        if (Config.HAS_MEMBERSHIP) {
+          if (this.shouldKeepFish(level, isCrownFish, isNewFish)) {
+            logger.d("Should keep fish");
+            logger.i("Touch store button");
+            Control.touch(Const.buttonStore2);
+            logger.i("Sleep 1000ms");
+            Thread.sleep(1000);
+            continue;
           }
-          Control.touch(btnConfirmOpenCard);
-          Thread.sleep(1000);
-          screenshot = Capture.takeScreenshot();
-          isMatchConfirmCard = Match.matchTemplate(screenshot, templateConfirmCard);
+          else {
+            logger.i("Touch sell button");
+            Control.touch(Const.buttonSell);
+            logger.i("Sleep 1000ms");
+            Thread.sleep(1000);
+            continue;
+          }
         }
-        Control.touch(btnConfirmCard);
-        continue;
-      }
-
-      boolean isMatchConfirmCard = Match.matchTemplate(screenshot, templateConfirmCard);
-      if (isMatchConfirmCard) {
-        Logger.i("Match confirm card");
-        Control.touch(btnConfirmCard);
-        Logger.i("Touch confirm card button");
-        Logger.i("Sleep 1000ms");
-        Thread.sleep(1000);
-        continue;
-      }
-
-      boolean isMatchBag = Match.matchTemplate(screenshot, bagTemplate);
-      if (isMatchBag) {
-        Logger.i("Touch throw button");
-        Control.touch(btnThrow);
-        Logger.i("Sleep 3000ms");
-        Thread.sleep(3000);
-        screenshot = Capture.takeScreenshot();
-        isMatchConfirmDialog = Match.matchTemplate(screenshot, templateConfirmDialog);
-        if (isMatchConfirmDialog) {
-          Logger.i("Match repair dialog");
-          Control.touch(btnConfirm);
-          Logger.i("Touch confirm button");
-          Logger.i("Sleep 1000ms");
-          Thread.sleep(2000);
-          Logger.i("Touch confirm button");
-          Control.touch(btnConfirm);
-          Logger.i("Sleep 1000ms");
+        else {
+          logger.i("Touch store button");
+          Control.touch(Const.buttonStore1);
+          logger.i("Sleep 1000ms");
           Thread.sleep(1000);
           continue;
         }
-        isMatchBag = Match.matchTemplate(screenshot, bagTemplate);
-        if (!isMatchBag) {
-          Logger.i("Throw rod successfully");
+      }
+
+      if (Matcher.isMatchTrash(screenshot)) {
+        logger.i("Type=Trash");
+        logger.i("Touch store button");
+        Control.touch(Const.buttonStore1);
+        logger.i("Sleep 1000ms");
+        Thread.sleep(1000);
+        continue;
+      }
+
+      if (Matcher.isMatchBag(screenshot)) {
+
+        logger.d("Match bag");
+        logger.i("Touch throw button");
+        Control.touch(Const.buttonThrowRod);
+        logger.i("Sleep 3000ms");
+        Thread.sleep(3000);
+
+        screenshot = Capture.takeScreenshot();
+        if (Matcher.isMatchConfirmDialog(screenshot)) {
+          logger.d("Match repair dialog");
+          logger.i("Touch confirm button");
+          Control.touch(Const.buttonConfirmDialog);
+          logger.i("Sleep 2000ms");
+          Thread.sleep(2000);
+          logger.i("Touch confirm button");
+          Control.touch(Const.buttonConfirmDialog);
+          logger.i("Sleep 1000ms");
+          Thread.sleep(1000);
+          continue;
+        }
+
+        if (!Matcher.isMatchBag(screenshot)) {
+          logger.i("Throw rod successfully");
           isJerk = false;
+          isOpenCard = false;
           numberFailThrowRod = 0;
-          Logger.i("Sleep 13000ms");
+          logger.i("Sleep 13000ms");
           Thread.sleep(13000);
-          Logger.i("Wait for fish eat bait");
+          logger.i("Wait for fish eat bait");
           mark = computeCurrentMarkValue(screenshot);
           continue;
         }
@@ -154,85 +157,38 @@ public class Fishing {
         }
       }
 
-      Mark currentMark = computeCurrentMarkValue(screenshot);
+      MeanStd currentMark = computeCurrentMarkValue(screenshot);
       if (mark.getMean() == -1) {
         mark = currentMark;
         continue;
       }
 
       double dental = Math.abs(mark.getStd() - currentMark.getStd()) * 1.0 / (mark.getStd() + (Config.STD_EPSILON + mark.getStd()));
+      if (!isJerk) {
+        logger.d("Old std=" + mark.getStd() + " Current std=" + currentMark.getStd() + " Dental=" + dental);
+      }
 
-//      if (!isJerk) {
-//        Logger.i("Old std=" + mark.getStd() + " Current std=" + currentMark.getStd() + " Dental=" + dental);
-//      }
-      if (!isJerk && (dental > Config.STD_CHANGE_THRESHOLD) ) {
-        Logger.i("Dental=" + dental);
-        Logger.i("Jerk rod");
-        Control.touch(btnJerk);
-        isJerk = true;
-        Logger.i("Sleep 2000ms");
+      if (isJerk && isOpenCard) {
+        logger.i("Touch confirm button");
+        Control.touch(Const.buttonConfirmCard);
+        logger.i("Sleep 2000ms");
         Thread.sleep(2000);
-      }
-      mark = currentMark;
-    }
-  }
-
-  private void startFishAndSell() throws Exception {
-    Logger.i("Is preserve new fish" + isPreserveNewFish);
-    Logger.i(newFishTemplate.getName());
-    throw new Exception("This will be implemented soon");
-  }
-
-  private void startThrowRodOnly() throws Exception {
-
-    while (true) {
-      Image screenshot = Capture.takeScreenshot();
-
-      if (screenshot.getWidth() == 0) {
-        break;
-      }
-
-      boolean isMatchConfirmDialog = Match.matchTemplate(screenshot, templateConfirmDialog);
-      if (isMatchConfirmDialog) {
-        Logger.i("Match confirm dialog");
-        Control.touch(btnConfirm);
-        Logger.i("Touch confirm button");
         continue;
       }
 
-      boolean isMatchBag = Match.matchTemplate(screenshot, bagTemplate);
-      if (isMatchBag) {
-        Logger.i("Touch throw button");
-        Control.touch(btnThrow);
-        Logger.i("Sleep 3000ms");
-        Thread.sleep(3000);
-        screenshot = Capture.takeScreenshot();
-        isMatchConfirmDialog = Match.matchTemplate(screenshot, templateConfirmDialog);
-        if (isMatchConfirmDialog) {
-          Logger.i("Match repair dialog");
-          Control.touch(btnConfirm);
-          Logger.i("Touch confirm button");
-          Logger.i("Sleep 1000ms");
-          Thread.sleep(2000);
-          Logger.i("Touch confirm button");
-          Control.touch(btnConfirm);
-          Logger.i("Sleep 1000ms");
-          Thread.sleep(1000);
-          continue;
-        }
-        isMatchBag = Match.matchTemplate(screenshot, bagTemplate);
-        if (!isMatchBag) {
-          Logger.i("Throw rod successfully");
-        }
+      if (!isJerk && (dental > Config.STD_CHANGE_THRESHOLD) ) {
+        logger.i("Dental=" + dental);
+        logger.i("Jerk rod");
+        logger.i("Touch jerk button");
+        Control.touch(Const.buttonJerk);
+        isJerk = true;
+        logger.i("Sleep 2000ms");
+        Thread.sleep(2000);
       }
     }
   }
 
-  /*
-  * Get current mark value
-  * Return mean and std of mark value in square
-  * */
-  private Mark computeCurrentMarkValue(Image screenshot) {
+  private MeanStd computeCurrentMarkValue(Image screenshot) {
     long total_pixels_value = 0;
     int offsetX = Config.MARK_POSITION_X - Config.MARK_WIDTH / 2;
     int offsetY = Config.MARK_POSITION_Y - Config.MARK_HEIGHT / 2;
@@ -252,26 +208,50 @@ public class Fishing {
       }
     }
     long std = (long) Math.sqrt(dental * 1.0 / Config.MARK_SQUARE);
-    return new Mark(mean, std);
+    return new MeanStd(mean, std);
   }
 
-  private void init() {
+  private int getFishLevel(Image screenshot) {
+    int x = 1030, y = 300;
+    logger.d("[getFishLevel] Pixel=" + screenshot.getPixel(x, y));
+    switch (screenshot.getPixel(x, y)) {
+      case -1777467: return 0;
+      case -6036377: return 1;
+      case -10893607: return 2;
+      case -1600536: return 3;
+    }
+    return 4;
+  }
 
-    btnThrow = new Button("ThrowRod", 1015, 440);
-    btnPreserve = new Button("Preserve", 920, 565);
-    btnJerk = new Button("Jerk", 1130, 560);
-    btnConfirm = new Button("Confirm", 640, 540);
-    btnOpenCard = new Button("OpenCard", 1030, 570);
-    btnConfirmOpenCard = new Button("ConfirmOpenCard", 140, 660);
-    btnConfirmCard = new Button("ConfirmCard", 645, 615);
+  private boolean isCrownFish(Image screenshot) {
+    int pixelColor = -469448, x = 1020, y = 188;
+    logger.d("[isCrownFish] Pixel=" + screenshot.getPixel(x, y));
+    return screenshot.getPixel(x, y) == pixelColor;
+  }
 
-    bagTemplate = new Template("bag", 1210, 400, "/data/local/tmp/assets/template_bag.png");
-    preserveTemplate = new Template("preserve", 875, 590, "/data/local/tmp/assets/template_preserve2.png");
-//    preserveTemplate = new Template("preserve", 850, 200, "/data/local/tmp/assets/template_preserve.png");
-    newFishTemplate = new Template("new_fish", 1170, 300, "/data/local/tmp/assets/template_new_fish.png");
-    templateConfirmDialog = new Template("confirm_dialog", 400, 250, "/data/local/tmp/assets/template_confirm_dialog.png");
-    templateOpenCard = new Template("open_card", 1055, 600, "/data/local/tmp/assets/template_open_card.png");
-    templateConfirmCard = new Template("confirm_card", 690, 600, "/data/local/tmp/assets/template_confirm_card.png");
+  private boolean isNewFish(Image screenshot) {
+    int pixelColor = -1349534, x = 1168, y = 321;
+    logger.d("[isNewFish] Pixel=" + screenshot.getPixel(x, y));
+    return screenshot.getPixel(x, y) == pixelColor;
+  }
 
+  private boolean shouldKeepFish(int fishLevel, boolean isCrownFish, boolean isNewFish) {
+    if (Config.SELL_ALL_FISH) {
+      return false;
+    }
+
+    if (isNewFish) {
+      return true;
+    }
+
+    if (fishLevel >= 3) {
+      return true;
+    }
+
+    if (fishLevel == 2 && isCrownFish) {
+      return true;
+    }
+
+    return false;
   }
 }

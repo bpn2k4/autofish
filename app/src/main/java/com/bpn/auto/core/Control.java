@@ -1,11 +1,9 @@
 package com.bpn.auto.core;
 
-
 import android.os.SystemClock;
 import android.view.InputEvent;
 import android.view.MotionEvent;
 import java.lang.reflect.Method;
-
 
 public class Control {
 
@@ -19,9 +17,7 @@ public class Control {
       Class<?> inputManagerClass = Class.forName(getInputManagerClassName());
       Method getInstanceMethod = inputManagerClass.getDeclaredMethod("getInstance");
       inputManagerInstance = getInstanceMethod.invoke(null);
-      if (inputManagerInstance == null) {
-        throw new Exception("inputManagerInstance is null");
-      }
+      assert inputManagerInstance != null;
       injectInputEventMethod = inputManagerInstance.getClass().getMethod("injectInputEvent", InputEvent.class, int.class);
 
       pointerProperties = new MotionEvent.PointerProperties[1];

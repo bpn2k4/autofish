@@ -1,11 +1,11 @@
 package com.bpn.auto.core;
 
-
-public class Mark {
+public class MeanStd {
+  
   private final long mean;
   private final long std;
 
-  public Mark(long mean, long std) {
+  public MeanStd(long mean, long std) {
     this.mean = mean;
     this.std = std;
   }
