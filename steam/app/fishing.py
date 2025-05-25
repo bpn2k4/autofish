@@ -30,32 +30,6 @@ class Fishing:
         time.sleep(1)
         continue
 
-      if self.matcher.is_match_confirm_sell(screenshot):
-        self.control.touch(Const.button_confirm_sell)
-        time.sleep(1)
-        continue
-
-      if self.matcher.is_match_fish(screenshot):
-        time.sleep(0.2)
-        screenshot = self.capture.take_screenshot()
-        level = self.get_fish_level(screenshot)
-        is_crowned = self.matcher.is_match_crowned_fish(screenshot)
-        is_new_fish = self.matcher.is_match_new_fish(screenshot)
-        print(f"type=fish level={level} is_crowned={is_crowned} is_new_fish={is_new_fish}")
-
-        if Config.HAS_MEMBERSHIP:
-          pass
-        else:
-          self.control.touch(Const.button_store1)
-          time.sleep(1)
-          continue
-
-      if self.matcher.is_match_trash(screenshot):
-        print("type=trash")
-        self.control.touch(Const.button_store1)
-        time.sleep(1)
-        continue
-
       if self.matcher.is_match_bag(screenshot):
         self.control.touch(Const.button_throw_rod)
         time.sleep(3)
@@ -75,6 +49,40 @@ class Fishing:
           self.mark_value = self.compute_mark_value(screenshot)
         else:
           self.number_fail += 1
+
+      if self.matcher.is_match_confirm_sell(screenshot):
+        self.control.touch(Const.button_confirm_sell)
+        time.sleep(1)
+        continue
+
+      if self.matcher.is_match_fish(screenshot):
+        time.sleep(0.2)
+        screenshot = self.capture.take_screenshot()
+        level = self.get_fish_level(screenshot)
+        is_crowned = self.matcher.is_match_crowned_fish(screenshot)
+        is_new_fish = self.matcher.is_match_new_fish(screenshot)
+        print(f"type=fish level={level} is_crowned={is_crowned} is_new_fish={is_new_fish}")
+
+        if Config.HAS_MEMBERSHIP:
+          if self.should_keep_fish(level, is_crowned, is_new_fish):
+            self.control.touch(Const.button_store2)
+            time.sleep(1)
+            continue
+          else:
+            self.control.touch(Const.button_sell)
+            time.sleep(1)
+            continue
+
+        else:
+          self.control.touch(Const.button_store1)
+          time.sleep(1)
+          continue
+
+      if self.matcher.is_match_trash(screenshot):
+        print("type=trash")
+        self.control.touch(Const.button_store1)
+        time.sleep(1)
+        continue
 
       if self.matcher.is_match_card(screenshot):
         print("type=card")
