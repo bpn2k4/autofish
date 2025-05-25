@@ -5,3 +5,7 @@
 # Ignore Gradle build output directory
 build
 local.properties
+
+.vscode
+__pycache__
+www
