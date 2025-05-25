@@ -12,5 +12,5 @@ class Const:
   button_confirm_dialog = Button(640, 500)
   button_open_card = Button(1090, 520)
   button_open_all_card = Button(145, 660)
-  button_confirm_card = Button(640, 615)
+  button_confirm_card = Button(640, 555)
   button_center = Button(640, 360)
