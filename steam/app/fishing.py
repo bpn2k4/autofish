@@ -1,9 +1,10 @@
-from app.control import Control
 from app.capture import Capture
-from app.matcher import Matcher
-from app.const import Const
 from app.config import Config
+from app.const import Const
+from app.control import Control
 from app.image import Image
+from app.logger import Logger
+from app.matcher import Matcher
 import time
 
 
@@ -12,6 +13,7 @@ class Fishing:
     self.capture = Capture()
     self.control = Control()
     self.matcher = Matcher()
+    self.logger = Logger()
     self.mark_value = (-1, -1)
     self.is_jerked = False
     self.is_open_card = False
@@ -27,19 +29,19 @@ class Fishing:
 
       if self.matcher.is_match_confirm_dialog(screenshot):
         self.control.touch(Const.button_confirm_dialog)
-        time.sleep(1)
+        time.sleep(0.5)
         continue
 
       if self.matcher.is_match_bag(screenshot):
         self.control.touch(Const.button_throw_rod)
-        time.sleep(3)
+        time.sleep(1)
 
         screenshot = self.capture.take_screenshot()
         if self.matcher.is_match_confirm_dialog(screenshot):
           self.control.touch(Const.button_confirm_dialog)
-          time.sleep(2)
-          self.control.touch(Const.button_confirm_dialog)
           time.sleep(1)
+          self.control.touch(Const.button_confirm_dialog)
+          time.sleep(0.5)
           continue
         elif not self.matcher.is_match_bag(screenshot):
           self.is_jerked = False
@@ -52,7 +54,7 @@ class Fishing:
 
       if self.matcher.is_match_confirm_sell(screenshot):
         self.control.touch(Const.button_confirm_sell)
-        time.sleep(1)
+        time.sleep(0.5)
         continue
 
       if self.matcher.is_match_fish(screenshot):
@@ -61,49 +63,49 @@ class Fishing:
         level = self.get_fish_level(screenshot)
         is_crowned = self.matcher.is_match_crowned_fish(screenshot)
         is_new_fish = self.matcher.is_match_new_fish(screenshot)
-        print(f"type=fish level={level} is_crowned={is_crowned} is_new_fish={is_new_fish}")
+        self.logger.i(f"type=fish level={level} is_crowned={is_crowned} is_new_fish={is_new_fish}")
 
         if Config.HAS_MEMBERSHIP:
           if self.should_keep_fish(level, is_crowned, is_new_fish):
             self.control.touch(Const.button_store2)
-            time.sleep(1)
+            time.sleep(0.5)
             continue
           else:
             self.control.touch(Const.button_sell)
-            time.sleep(1)
+            time.sleep(0.5)
             continue
 
         else:
           self.control.touch(Const.button_store1)
-          time.sleep(1)
+          time.sleep(0.5)
           continue
 
       if self.matcher.is_match_trash(screenshot):
-        print("type=trash")
+        self.logger.i("type=trash")
         self.control.touch(Const.button_store1)
-        time.sleep(1)
+        time.sleep(0.5)
         continue
 
       if self.matcher.is_match_card(screenshot):
-        print("type=card")
+        self.logger.i("type=card")
         self.is_open_card = True
         self.control.touch(Const.button_open_card)
-        time.sleep(1)
+        time.sleep(0.5)
         continue
 
       if self.matcher.is_match_open_all_card(screenshot):
         self.control.touch(Const.button_open_all_card)
-        time.sleep(1)
+        time.sleep(0.5)
         continue
 
       if self.matcher.is_match_confirm_card(screenshot):
         self.control.touch(Const.button_confirm_card)
-        time.sleep(1)
+        time.sleep(0.5)
         continue
 
       if self.is_jerked and self.is_open_card:
         self.control.touch(Const.button_confirm_card)
-        time.sleep(1)
+        time.sleep(0.5)
         continue
 
       mark = self.compute_mark_value(screenshot)
@@ -113,10 +115,10 @@ class Fishing:
 
       dental = abs((mark[1] - self.mark_value[1]) / (self.mark_value[1] + Config.STD_EPSILON))
       # if not self.is_jerked:
-      #   print(f"old_mark={self.mark_value[1]} new_mark={mark[1]} dental={dental}")
+      #   print(f"old_mark={self.mark_value[1]} new_mark={mark[1]} dental={round(dental, 2)}")
 
       if not self.is_jerked and dental > Config.STD_CHANGE_THRESHOLD:
-        print("dental", dental)
+        self.logger.i(f"dental={round(dental, 2)}")
         self.control.touch(Const.button_jerk)
         self.is_jerked = True
         time.sleep(2)
