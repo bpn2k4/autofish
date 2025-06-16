@@ -1,9 +1,10 @@
+import time
+import random
+
 from app.button import Button
 from app.capture import Capture
 from app.control import Control
 from app.image import Image
-import time
-import random
 
 
 button_go = Button(1165, 605)

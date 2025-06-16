@@ -1,9 +1,10 @@
 import win32gui
 import win32ui
 import numpy as np
-from app.const import Const
-from app.image import Image
 from ctypes import windll
+
+from app.image import Image
+from app.const import Const
 
 
 class Capture:

@@ -1,3 +1,5 @@
+import time
+
 from app.capture import Capture
 from app.config import Config
 from app.const import Const
@@ -5,7 +7,6 @@ from app.control import Control
 from app.image import Image
 from app.logger import Logger
 from app.matcher import Matcher
-import time
 
 
 class Fishing:

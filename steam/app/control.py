@@ -1,8 +1,6 @@
-import win32api
-import win32con
 import win32gui
 import pyautogui
-import time
+
 from app.button import Button
 from app.const import Const
 
