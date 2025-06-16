@@ -7,5 +7,5 @@ class Config:
   STD_EPSILON = 10000000
   STD_CHANGE_THRESHOLD = 5
   DEBUG = False
-  HAS_MEMBERSHIP = False
+  HAS_MEMBERSHIP = True
   SELL_ALL_FISH = False
