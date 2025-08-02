@@ -12,7 +12,7 @@ class Matcher:
     return screenshot.get_pixel(640, 515) == -12466701 and screenshot.get_pixel(470, 515) == -1
 
   def is_match_confirm_sell(self, screenshot: Image) -> bool:
-    return screenshot.get_pixel(700, 500) == -12466701 and screenshot.get_pixel(640, 500) == -1
+    return screenshot.get_pixel(700, 518) == -12466701 and screenshot.get_pixel(640, 500) == -1
 
   def is_match_fish(self, screenshot: Image) -> bool:
     return screenshot.get_pixel(950, 370) == -462618 and screenshot.get_pixel(950, 410) == -1582389
@@ -34,3 +34,6 @@ class Matcher:
 
   def is_match_new_fish(self, screenshot: Image) -> bool:
     return screenshot.get_pixel(1195, 324) == -1349534
+
+  def is_match_mutant_fish(self, screenshot: Image) -> bool:
+    return screenshot.get_pixel(1115, 297) == -10063626

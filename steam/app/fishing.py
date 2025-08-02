@@ -35,7 +35,7 @@ class Fishing:
 
       if self.matcher.is_match_bag(screenshot):
         self.control.touch(Const.button_throw_rod)
-        time.sleep(1)
+        time.sleep(3)
 
         screenshot = self.capture.take_screenshot()
         if self.matcher.is_match_confirm_dialog(screenshot):
@@ -48,7 +48,7 @@ class Fishing:
           self.is_jerked = False
           self.is_open_card = False
           self.number_fail = 0
-          time.sleep(13)
+          time.sleep(12)
           self.mark_value = self.compute_mark_value(screenshot)
         else:
           self.number_fail += 1
@@ -64,10 +64,11 @@ class Fishing:
         level = self.get_fish_level(screenshot)
         is_crowned = self.matcher.is_match_crowned_fish(screenshot)
         is_new_fish = self.matcher.is_match_new_fish(screenshot)
-        self.logger.i(f"type=fish level={level} is_crowned={is_crowned} is_new_fish={is_new_fish}")
+        is_mutant_fish = self.matcher.is_match_mutant_fish(screenshot)
+        self.logger.i(f"type=fish level={level} is_crowned={is_crowned} is_new_fish={is_new_fish} is_mutant_fish={is_mutant_fish}")
 
         if Config.HAS_MEMBERSHIP:
-          if self.should_keep_fish(level, is_crowned, is_new_fish):
+          if self.should_keep_fish(level, is_crowned, is_new_fish, is_mutant_fish):
             self.control.touch(Const.button_store2)
             time.sleep(0.5)
             continue
@@ -131,14 +132,16 @@ class Fishing:
     total_pixel_value = 0
     offset_x = Config.MARK_POSITION_X - Config.MARK_WIDTH // 2
     offset_y = Config.MARK_POSITION_Y - Config.MARK_HEIGHT // 2
-    for i in range(Config.MARK_WIDTH):
-      for j in range(Config.MARK_HEIGHT):
+    n = 0
+    for i in range(0, Config.MARK_WIDTH, 2):
+      for j in range(0, Config.MARK_HEIGHT, 2):
         pixel = screenshot.get_pixel(offset_x + i, offset_y + j)
         total_pixel_value += pixel
-    mean = total_pixel_value / Config.MARK_SQUARE
+        n += 1
+    mean = total_pixel_value / n
     dental = 0
-    for i in range(Config.MARK_WIDTH):
-      for j in range(Config.MARK_HEIGHT):
+    for i in range(0, Config.MARK_WIDTH, 2):
+      for j in range(0, Config.MARK_HEIGHT, 2):
         pixel = screenshot.get_pixel(offset_x + i, offset_y + j)
         difference = pixel - mean
         dental += difference * difference
@@ -158,11 +161,13 @@ class Fishing:
     else:
       return 4
 
-  def should_keep_fish(self, level: int, is_crowned: bool, is_new_fish: bool) -> bool:
+  def should_keep_fish(self, level: int, is_crowned: bool, is_new_fish: bool, is_mutant_fish: bool) -> bool:
     if is_new_fish:
       return True
     if level >= 3:
       return True
-    if level == 2 and is_crowned:
+    if is_mutant_fish:
       return True
+    # if level == 2 and is_crowned:
+    #   return True
     return False
