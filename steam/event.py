@@ -1,6 +1,6 @@
-from app.event import VoyageEvent
+from app.event import VoyageEvent, MysteryTownEvent
 
 
 if __name__ == '__main__':
-  event = VoyageEvent()
+  event = MysteryTownEvent()
   event.start()
