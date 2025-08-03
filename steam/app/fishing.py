@@ -66,7 +66,7 @@ class Fishing:
         is_new_fish = self.matcher.is_match_new_fish(screenshot)
         is_mutant_fish = self.matcher.is_match_mutant_fish(screenshot)
         is_mini_fish = self.matcher.is_match_mini_fish(screenshot)
-        self.logger.i(f"type=fish level={level} is_crowned={is_crowned} is_new_fish={is_new_fish} is_mutant_fish={is_mutant_fish} is_mini_fish={is_mini_fish}")
+        self.logger.i(f"type=fish level={level} is_crowned={is_crowned} is_new={is_new_fish} is_mutant={is_mutant_fish} is_mini={is_mini_fish}")
 
         if Config.HAS_MEMBERSHIP:
           if self.should_keep_fish(level, is_crowned, is_new_fish, is_mutant_fish, is_mini_fish):
