@@ -65,10 +65,11 @@ class Fishing:
         is_crowned = self.matcher.is_match_crowned_fish(screenshot)
         is_new_fish = self.matcher.is_match_new_fish(screenshot)
         is_mutant_fish = self.matcher.is_match_mutant_fish(screenshot)
-        self.logger.i(f"type=fish level={level} is_crowned={is_crowned} is_new_fish={is_new_fish} is_mutant_fish={is_mutant_fish}")
+        is_mini_fish = self.matcher.is_match_mini_fish(screenshot)
+        self.logger.i(f"type=fish level={level} is_crowned={is_crowned} is_new_fish={is_new_fish} is_mutant_fish={is_mutant_fish} is_mini_fish={is_mini_fish}")
 
         if Config.HAS_MEMBERSHIP:
-          if self.should_keep_fish(level, is_crowned, is_new_fish, is_mutant_fish):
+          if self.should_keep_fish(level, is_crowned, is_new_fish, is_mutant_fish, is_mini_fish):
             self.control.touch(Const.button_store2)
             time.sleep(0.5)
             continue
@@ -161,13 +162,15 @@ class Fishing:
     else:
       return 4
 
-  def should_keep_fish(self, level: int, is_crowned: bool, is_new_fish: bool, is_mutant_fish: bool) -> bool:
+  def should_keep_fish(self, level: int, is_crowned: bool, is_new_fish: bool, is_mutant_fish: bool, is_mini_fish: bool) -> bool:
     if is_new_fish:
-      return True
-    if level >= 3:
       return True
     if is_mutant_fish:
       return True
-    # if level == 2 and is_crowned:
-    #   return True
+    if is_mini_fish:
+      return False
+    if level > 3:
+      return True
+    if level == 3 and is_crowned:
+      return True
     return False

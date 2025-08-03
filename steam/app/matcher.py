@@ -37,3 +37,6 @@ class Matcher:
 
   def is_match_mutant_fish(self, screenshot: Image) -> bool:
     return screenshot.get_pixel(1115, 297) == -10063626
+
+  def is_match_mini_fish(self, screenshot: Image) -> bool:
+    return screenshot.get_pixel(1115, 297) == -9473
