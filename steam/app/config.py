@@ -11,7 +11,8 @@ class Location:
   FISHING_SPOT = 65
   DOWNTOWN_FOUNTAIN = 65
   DOWNTOWN_POND = 65
-  BLUE_HOLE = 65
+  BLUE_HOLE = 165
+  STADIUM_DEEP_SEA = 150
 
 
 class Config:
