@@ -2,5 +2,5 @@ from app.event import VoyageEvent, MysteryTownEvent
 
 
 if __name__ == '__main__':
-  event = MysteryTownEvent()
+  event = VoyageEvent()
   event.start()

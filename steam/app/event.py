@@ -45,7 +45,7 @@ class VoyageEvent:
     x = 440 + i * 130
     y = 240 + j * 130
     self.control.touch(Button(x, y))
-    time.sleep(1)
+    time.sleep(0.2)
 
 
 class MysteryTownEvent:
