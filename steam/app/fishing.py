@@ -165,8 +165,6 @@ class Fishing:
   def should_keep_fish(self, level: int, is_crowned: bool, is_new_fish: bool, is_mutant_fish: bool, is_mini_fish: bool) -> bool:
     if is_new_fish:
       return True
-    if is_mutant_fish:
-      return True
     if is_mini_fish:
       return False
     if level > 3:
