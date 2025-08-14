@@ -15,6 +15,7 @@ class Location:
   STADIUM_DEEP_SEA = 150
   RESORT_DEEP_SEA = 105
   RESORT_NORTH_ISLAND_POND = 85
+  PLAZA_BEACH = 20
 
 
 class Config:
