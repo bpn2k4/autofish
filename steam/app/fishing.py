@@ -111,6 +111,11 @@ class Fishing:
         time.sleep(0.5)
         continue
 
+      if self.matcher.is_match_confirm_item(screenshot):
+        self.control.touch(Const.button_confirm_card)
+        time.sleep(0.5)
+        continue
+
       mark = self.compute_mark_value(screenshot)
       if self.mark_value == (-1, -1):
         self.mark_value = mark

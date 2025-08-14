@@ -40,3 +40,6 @@ class Matcher:
 
   def is_match_mini_fish(self, screenshot: Image) -> bool:
     return screenshot.get_pixel(1115, 297) == -9473
+
+  def is_match_confirm_item(self, screenshot: Image) -> bool:
+    return screenshot.get_pixel(1200, 100) in [-3949925, -11358125, -11103001, -4361762]
