@@ -9,3 +9,4 @@ local.properties
 .vscode
 __pycache__
 www
+data/

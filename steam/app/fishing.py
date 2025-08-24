@@ -1,4 +1,7 @@
 import time
+import cv2
+import os
+from datetime import datetime
 
 from app.capture import Capture
 from app.config import Config
@@ -7,6 +10,7 @@ from app.control import Control
 from app.image import Image
 from app.logger import Logger
 from app.matcher import Matcher
+from app.fish import FISH_TEMPLATES, FishIdx
 
 
 class Fishing:
@@ -21,6 +25,8 @@ class Fishing:
     self.number_fail = 0
 
   def start(self):
+    if Config.SAVE_FISH_IMAGE:
+      os.makedirs(Config.FISH_IMAGE_DIR, exist_ok=True)
 
     while True:
       if self.number_fail > 10:
@@ -66,10 +72,16 @@ class Fishing:
         is_new_fish = self.matcher.is_match_new_fish(screenshot)
         is_mutant_fish = self.matcher.is_match_mutant_fish(screenshot)
         is_mini_fish = self.matcher.is_match_mini_fish(screenshot)
+        fish_id = self.get_fish_id(screenshot)
         self.logger.i(f"type=fish level={level} is_crowned={is_crowned} is_new={is_new_fish} is_mutant={is_mutant_fish} is_mini={is_mini_fish}")
 
+        if Config.SAVE_FISH_IMAGE:
+          now = datetime.now().strftime("%Y%m%d%H%M%S")
+          image_path = os.path.join(Config.FISH_IMAGE_DIR, f"{fish_id}-{now}.png")
+          cv2.imwrite(image_path, screenshot.data)
+
         if Config.HAS_MEMBERSHIP:
-          if self.should_keep_fish(level, is_crowned, is_new_fish, is_mutant_fish, is_mini_fish):
+          if self.should_keep_fish(level, is_crowned, is_new_fish, is_mutant_fish, is_mini_fish, fish_id):
             self.control.touch(Const.button_store2)
             time.sleep(0.5)
             continue
@@ -167,8 +179,17 @@ class Fishing:
     else:
       return 4
 
-  def should_keep_fish(self, level: int, is_crowned: bool, is_new_fish: bool, is_mutant_fish: bool, is_mini_fish: bool) -> bool:
+  def get_fish_id(self, screenshot: Image) -> int:
+    x, y = 1085, 270
+    for idx, pixels in FISH_TEMPLATES:
+      if all(screenshot.get_pixel(x + i, y) == pixels[i] for i in range(6)):
+        return idx
+    return -1
+
+  def should_keep_fish(self, level: int, is_crowned: bool, is_new_fish: bool, is_mutant_fish: bool, is_mini_fish: bool, fish_id: int) -> bool:
     if is_new_fish:
+      return True
+    if fish_id in [FishIdx.MACKEREL, FishIdx.SPEARFISH] and not is_mutant_fish and not is_crowned:
       return True
     if is_mini_fish:
       return False

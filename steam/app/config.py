@@ -30,3 +30,5 @@ class Config:
   DEBUG = False
   HAS_MEMBERSHIP = True
   SELL_ALL_FISH = False
+  SAVE_FISH_IMAGE = False
+  FISH_IMAGE_DIR = 'data'
